@@ -121,3 +121,97 @@ TaskFlow includes a pre-built Docker image hosted on Docker Hub (`nirmal08/taskf
    curl -sL https://raw.githubusercontent.com/NirmalMishra08/taskflow/main/backend/internal/db/migrations/001_init.sql | docker exec -i postgres_db psql -U postgres -d taskdb
    ```
 Your app is fully live and listening on HTTP standard port `80` at **`http://<YOUR_DROPLET_IP>`**!
+
+
+## 🛠️ Development Workflow
+
+### Backend
+
+- Run Go backend locally (if not using Docker):
+  ```bash
+  cd backend
+  go run main.go
+  ```
+
+### Frontend
+
+- Start React dev server:
+  ```bash
+  cd frontend
+  npm install
+  npm run dev
+  ```
+
+### Lint / Type Check
+
+- Frontend Lint:
+  ```bash
+  npm run lint
+  ```
+
+### Database
+
+- Manage migrations:
+  ```bash
+  cd backend/internal/db/migrations
+  # edit or add migration files
+  ```
+
+## ⚙️ GitHub Actions CI/CD
+
+By default, on every push or PR:
+- Run backend unit tests (`backend/tests/`)
+- Lint and type-check frontend code
+- Build multi-stage Docker image and optionally push to Docker Hub
+- Run integration tests (if you have them set up)
+
+*See `.github/workflows/` for exact workflow files.*
+
+## 🗂️ Example `.env` files
+
+### Backend `.env`
+```
+SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_KEY=your_supabase_key
+DATABASE_URL=postgresql://user:pass@localhost:5432/taskdb
+PORT=8082
+JWT_SECRET=your_super_secret
+```
+
+### Frontend `.env`
+```
+VITE_BACKEND_URL=http://localhost:8082
+```
+
+## 👥 Demo/Test Accounts
+
+| Role | Email              | Password |
+|------|--------------------|----------|
+| Admin| admin@gmail.com    | admin123 |
+| User | user1@gmail.com    | user123  |
+
+*Do not use these in production!*
+
+## ⚡ Typical User Journey (Diagram)
+```mermaid
+graph TD
+    A[Create Task] --> B[Assign User]
+    B --> C[Attach Documents]
+    C --> D[User Updates Status]
+    D --> E[Admin Review]
+```
+
+## 🧑‍💻 Contributing
+
+* Fork the repository
+* Create a new branch (`feature/your-feature`)
+* Run all tests/lints before committing
+* Open a pull request with a clear description
+
+## 🛠️ Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| Port already in use | Run `docker compose down` then `up -d` again |
+| Supabase auth fail | Check `.env` values; ensure correct URL/key |
+| DB migration error | Ensure database exists, rerun init migration |
