@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: taskdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d taskdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskflow-app
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+    environment:
+      PORT: 8080
+      DB_URL: postgres://postgres:postgres@postgres:5432/taskdb?sslmode=disable
+      JWT_SECRET: super_premium_secure_taskflow_jwt_secret_key_2026
+      # Supabase configs (automatically injected from local .env file)
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
